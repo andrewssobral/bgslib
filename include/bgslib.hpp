@@ -236,19 +236,63 @@ public:
 
 namespace algorithms {
 
-// FrameDifference definition
+// FrameDifference algorithm
 class FrameDifference : public IBGS {
-
 private:
     bool enableThreshold;
     int threshold;
 
 public:
-    FrameDifference();
-    ~FrameDifference();
-    void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) override;
-    void setParams(const std::map<std::string, std::string>& params) override;
-    std::map<std::string, std::string> getParams() const override;
+    FrameDifference() : 
+        IBGS("FrameDifference"),
+        enableThreshold(true), threshold(15) {
+        debug_construction(FrameDifference);
+    }
+
+    ~FrameDifference() {
+        debug_destruction(FrameDifference);
+    }
+
+    void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) override {
+        init(img_input, img_output, img_bgmodel);
+
+        if (img_background.empty()) {
+            img_input.copyTo(img_background);
+            return;
+        }
+
+        cv::absdiff(img_background, img_input, img_foreground);
+
+        if (img_foreground.channels() == 3)
+            cv::cvtColor(img_foreground, img_foreground, cv::COLOR_BGR2GRAY);
+
+        if (enableThreshold)
+            cv::threshold(img_foreground, img_foreground, threshold, 255, cv::THRESH_BINARY);
+
+        img_foreground.copyTo(img_output);
+
+        img_input.copyTo(img_background);
+        img_background.copyTo(img_bgmodel);
+
+        firstTime = false;
+    }
+
+    void setParams(const std::map<std::string, std::string>& params) override {
+        for (const auto& param : params) {
+            if (param.first == "enableThreshold") {
+                enableThreshold = (param.second == "true");
+            } else if (param.first == "threshold") {
+                threshold = std::stoi(param.second);
+            }
+        }
+    }
+
+    std::map<std::string, std::string> getParams() const override {
+        return {
+            {"enableThreshold", enableThreshold ? "true" : "false"},
+            {"threshold", std::to_string(threshold)}
+        };
+    }
 };
 bgs_register(FrameDifference);
 
@@ -313,58 +357,6 @@ bgs_register(WeightedMovingMean);
 } // namespace algorithms
 
 } // namespace bgslib
-
-// FrameDifference implementation
-bgslib::algorithms::FrameDifference::FrameDifference() : 
-    IBGS(quote(FrameDifference)),
-    enableThreshold(true), threshold(15) {
-    debug_construction(FrameDifference);
-}
-
-bgslib::algorithms::FrameDifference::~FrameDifference() {
-    debug_destruction(FrameDifference);
-}
-
-void bgslib::algorithms::FrameDifference::process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) {
-    init(img_input, img_output, img_bgmodel);
-
-    if (img_background.empty()) {
-        img_input.copyTo(img_background);
-        return;
-    }
-
-    cv::absdiff(img_background, img_input, img_foreground);
-
-    if (img_foreground.channels() == 3)
-        cv::cvtColor(img_foreground, img_foreground, cv::COLOR_BGR2GRAY);
-
-    if (enableThreshold)
-        cv::threshold(img_foreground, img_foreground, threshold, 255, cv::THRESH_BINARY);
-
-    img_foreground.copyTo(img_output);
-
-    img_input.copyTo(img_background);
-    img_background.copyTo(img_bgmodel);
-
-    firstTime = false;
-}
-
-void bgslib::algorithms::FrameDifference::setParams(const std::map<std::string, std::string>& params) {
-    for (const auto& param : params) {
-        if (param.first == "enableThreshold") {
-            enableThreshold = (param.second == "true");
-        } else if (param.first == "threshold") {
-            threshold = std::stoi(param.second);
-        }
-    }
-}
-
-std::map<std::string, std::string> bgslib::algorithms::FrameDifference::getParams() const {
-    return {
-        {"enableThreshold", enableThreshold ? "true" : "false"},
-        {"threshold", std::to_string(threshold)}
-    };
-}
 
 // AdaptiveBackgroundLearning implementation
 bgslib::algorithms::AdaptiveBackgroundLearning::AdaptiveBackgroundLearning() : 
