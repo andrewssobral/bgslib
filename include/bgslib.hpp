@@ -469,7 +469,7 @@ public:
 };
 bgs_register(AdaptiveSelectiveBackgroundLearning);
 
-// WeightedMovingMean definition
+// WeightedMovingMean algorithm
 class WeightedMovingMean : public IBGS {
 private:
     cv::Mat img_input_prev_1;
@@ -479,90 +479,83 @@ private:
     int threshold;
 
 public:
-    WeightedMovingMean();
-    ~WeightedMovingMean();
-    void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) override;
-    void setParams(const std::map<std::string, std::string>& params) override;
-    std::map<std::string, std::string> getParams() const override;
+    WeightedMovingMean() : 
+        IBGS("WeightedMovingMean"),
+        enableWeight(true), enableThreshold(true), threshold(15) {
+        debug_construction(WeightedMovingMean);
+    }
+
+    ~WeightedMovingMean() {
+        debug_destruction(WeightedMovingMean);
+    }
+
+    void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) override {
+        init(img_input, img_output, img_bgmodel);
+
+        if (img_input_prev_1.empty()) {
+            img_input.copyTo(img_input_prev_1);
+            return;
+        }
+
+        if (img_input_prev_2.empty()) {
+            img_input_prev_1.copyTo(img_input_prev_2);
+            img_input.copyTo(img_input_prev_1);
+            return;
+        }
+
+        cv::Mat img_input_f, img_input_prev_1_f, img_input_prev_2_f, img_background_f;
+        img_input.convertTo(img_input_f, CV_32F, 1. / 255.);
+        img_input_prev_1.convertTo(img_input_prev_1_f, CV_32F, 1. / 255.);
+        img_input_prev_2.convertTo(img_input_prev_2_f, CV_32F, 1. / 255.);
+
+        if (enableWeight)
+            img_background_f = ((img_input_f * 0.5) + (img_input_prev_1_f * 0.3) + (img_input_prev_2_f * 0.2));
+        else
+            img_background_f = ((img_input_f) + (img_input_prev_1_f) + (img_input_prev_2_f)) / 3.0;
+
+        img_background_f.convertTo(img_background, CV_8U, 255.0);
+
+        cv::absdiff(img_input, img_background, img_foreground);
+
+        if (img_foreground.channels() == 3)
+            cv::cvtColor(img_foreground, img_foreground, cv::COLOR_BGR2GRAY);
+
+        if (enableThreshold)
+            cv::threshold(img_foreground, img_foreground, threshold, 255, cv::THRESH_BINARY);
+
+        img_foreground.copyTo(img_output);
+        img_background.copyTo(img_bgmodel);
+
+        img_input_prev_1.copyTo(img_input_prev_2);
+        img_input.copyTo(img_input_prev_1);
+
+        firstTime = false;
+    }
+
+    void setParams(const std::map<std::string, std::string>& params) override {
+        for (const auto& param : params) {
+            if (param.first == "enableWeight") {
+                enableWeight = (param.second == "true");
+            } else if (param.first == "enableThreshold") {
+                enableThreshold = (param.second == "true");
+            } else if (param.first == "threshold") {
+                threshold = std::stoi(param.second);
+            }
+        }
+    }
+
+    std::map<std::string, std::string> getParams() const override {
+        return {
+            {"enableWeight", enableWeight ? "true" : "false"},
+            {"enableThreshold", enableThreshold ? "true" : "false"},
+            {"threshold", std::to_string(threshold)}
+        };
+    }
 };
 bgs_register(WeightedMovingMean);
 
 } // namespace algorithms
 
 } // namespace bgslib
-
-// WeightedMovingMean implementation
-bgslib::algorithms::WeightedMovingMean::WeightedMovingMean() : 
-    IBGS(quote(WeightedMovingMean)),
-    enableWeight(true), enableThreshold(true), threshold(15) {
-    debug_construction(WeightedMovingMean);
-}
-
-bgslib::algorithms::WeightedMovingMean::~WeightedMovingMean() {
-    debug_destruction(WeightedMovingMean);
-}
-
-void bgslib::algorithms::WeightedMovingMean::process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) {
-    init(img_input, img_output, img_bgmodel);
-
-    if (img_input_prev_1.empty()) {
-        img_input.copyTo(img_input_prev_1);
-        return;
-    }
-
-    if (img_input_prev_2.empty()) {
-        img_input_prev_1.copyTo(img_input_prev_2);
-        img_input.copyTo(img_input_prev_1);
-        return;
-    }
-
-    cv::Mat img_input_f, img_input_prev_1_f, img_input_prev_2_f, img_background_f;
-    img_input.convertTo(img_input_f, CV_32F, 1. / 255.);
-    img_input_prev_1.convertTo(img_input_prev_1_f, CV_32F, 1. / 255.);
-    img_input_prev_2.convertTo(img_input_prev_2_f, CV_32F, 1. / 255.);
-
-    if (enableWeight)
-        img_background_f = ((img_input_f * 0.5) + (img_input_prev_1_f * 0.3) + (img_input_prev_2_f * 0.2));
-    else
-        img_background_f = ((img_input_f) + (img_input_prev_1_f) + (img_input_prev_2_f)) / 3.0;
-
-    img_background_f.convertTo(img_background, CV_8U, 255.0);
-
-    cv::absdiff(img_input, img_background, img_foreground);
-
-    if (img_foreground.channels() == 3)
-        cv::cvtColor(img_foreground, img_foreground, cv::COLOR_BGR2GRAY);
-
-    if (enableThreshold)
-        cv::threshold(img_foreground, img_foreground, threshold, 255, cv::THRESH_BINARY);
-
-    img_foreground.copyTo(img_output);
-    img_background.copyTo(img_bgmodel);
-
-    img_input_prev_1.copyTo(img_input_prev_2);
-    img_input.copyTo(img_input_prev_1);
-
-    firstTime = false;
-}
-
-void bgslib::algorithms::WeightedMovingMean::setParams(const std::map<std::string, std::string>& params) {
-    for (const auto& param : params) {
-        if (param.first == "enableWeight") {
-            enableWeight = (param.second == "true");
-        } else if (param.first == "enableThreshold") {
-            enableThreshold = (param.second == "true");
-        } else if (param.first == "threshold") {
-            threshold = std::stoi(param.second);
-        }
-    }
-}
-
-std::map<std::string, std::string> bgslib::algorithms::WeightedMovingMean::getParams() const {
-    return {
-        {"enableWeight", enableWeight ? "true" : "false"},
-        {"enableThreshold", enableThreshold ? "true" : "false"},
-        {"threshold", std::to_string(threshold)}
-    };
-}
 
 #endif // BGSLIB_HPP
