@@ -1,3 +1,5 @@
+#include <iterator>
+
 #include "bgslib.hpp"
 
 int main() {
