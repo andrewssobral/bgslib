@@ -236,7 +236,7 @@ public:
 
 namespace algorithms {
 
-// FrameDifference algorithm definition
+// FrameDifference definition
 class FrameDifference : public IBGS {
 
 private:
@@ -250,14 +250,33 @@ public:
     void setParams(const std::map<std::string, std::string>& params) override;
     std::map<std::string, std::string> getParams() const override;
 };
-
 bgs_register(FrameDifference);
+
+// AdaptiveBackgroundLearning definition
+class AdaptiveBackgroundLearning : public IBGS {
+private:
+    double alpha;
+    int maxLearningFrames;
+    long currentLearningFrame;
+    double minVal;
+    double maxVal;
+    bool enableThreshold;
+    int threshold;
+
+public:
+    AdaptiveBackgroundLearning();
+    ~AdaptiveBackgroundLearning();
+    void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) override;
+    void setParams(const std::map<std::string, std::string>& params) override;
+    std::map<std::string, std::string> getParams() const override;
+};
+bgs_register(AdaptiveBackgroundLearning);
 
 } // namespace algorithms
 
 } // namespace bgslib
 
-// FrameDifference algorithm implementation
+// FrameDifference implementation
 bgslib::algorithms::FrameDifference::FrameDifference() : IBGS(quote(FrameDifference)),
     enableThreshold(true), threshold(15) {
         debug_construction(FrameDifference);
@@ -303,6 +322,70 @@ void bgslib::algorithms::FrameDifference::setParams(const std::map<std::string, 
 
 std::map<std::string, std::string> bgslib::algorithms::FrameDifference::getParams() const {
     return {
+        {"enableThreshold", enableThreshold ? "true" : "false"},
+        {"threshold", std::to_string(threshold)}
+    };
+}
+
+// AdaptiveBackgroundLearning implementation
+bgslib::algorithms::AdaptiveBackgroundLearning::AdaptiveBackgroundLearning() : IBGS(quote(AdaptiveBackgroundLearning)),
+    alpha(0.05), maxLearningFrames(-1), currentLearningFrame(0), minVal(0.0),
+    maxVal(1.0), enableThreshold(true), threshold(15) {
+    debug_construction(AdaptiveBackgroundLearning);
+}
+
+bgslib::algorithms::AdaptiveBackgroundLearning::~AdaptiveBackgroundLearning() {
+    debug_destruction(AdaptiveBackgroundLearning);
+}
+
+void bgslib::algorithms::AdaptiveBackgroundLearning::process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) {
+    init(img_input, img_output, img_bgmodel);
+
+    if (img_background.empty())
+        img_input.copyTo(img_background);
+
+    cv::Mat img_input_f, img_background_f, img_diff_f;
+    img_input.convertTo(img_input_f, CV_32F, 1. / 255.);
+    img_background.convertTo(img_background_f, CV_32F, 1. / 255.);
+    cv::absdiff(img_input_f, img_background_f, img_diff_f);
+
+    if ((maxLearningFrames > 0 && currentLearningFrame < maxLearningFrames) || maxLearningFrames == -1) {
+        img_background_f = alpha * img_input_f + (1 - alpha) * img_background_f;
+        img_background_f.convertTo(img_background, CV_8U, 255.0 / (maxVal - minVal), -minVal);
+        
+        if (maxLearningFrames > 0 && currentLearningFrame < maxLearningFrames)
+            currentLearningFrame++;
+    }
+
+    img_diff_f.convertTo(img_foreground, CV_8UC1, 255.0 / (maxVal - minVal), -minVal);
+
+    if (enableThreshold)
+        cv::threshold(img_foreground, img_foreground, threshold, 255, cv::THRESH_BINARY);
+
+    img_foreground.copyTo(img_output);
+    img_background.copyTo(img_bgmodel);
+
+    firstTime = false;
+}
+
+void bgslib::algorithms::AdaptiveBackgroundLearning::setParams(const std::map<std::string, std::string>& params) {
+    for (const auto& param : params) {
+        if (param.first == "alpha") {
+            alpha = std::stod(param.second);
+        } else if (param.first == "maxLearningFrames") {
+            maxLearningFrames = std::stoi(param.second);
+        } else if (param.first == "enableThreshold") {
+            enableThreshold = (param.second == "true");
+        } else if (param.first == "threshold") {
+            threshold = std::stoi(param.second);
+        }
+    }
+}
+
+std::map<std::string, std::string> bgslib::algorithms::AdaptiveBackgroundLearning::getParams() const {
+    return {
+        {"alpha", std::to_string(alpha)},
+        {"maxLearningFrames", std::to_string(maxLearningFrames)},
         {"enableThreshold", enableThreshold ? "true" : "false"},
         {"threshold", std::to_string(threshold)}
     };

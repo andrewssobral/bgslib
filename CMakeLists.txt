@@ -26,3 +26,6 @@ target_link_libraries(interactive_camera_stream bgslib ${OpenCV_LIBS})
 
 add_executable(performance_metrics examples/performance_metrics.cpp)
 target_link_libraries(performance_metrics bgslib ${OpenCV_LIBS})
+
+add_executable(adaptive_background_learning_stream demos/adaptive_background_learning_stream.cpp)
+target_link_libraries(adaptive_background_learning_stream bgslib ${OpenCV_LIBS})
