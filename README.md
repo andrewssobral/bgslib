@@ -23,7 +23,7 @@ As bgslib is a header-only library, you don't need to compile it separately. Sim
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/bgslib.git
+   git clone https://github.com/andrewssobral/bgslib
    ```
 2. Add the `include` directory to your project's include path.
 
