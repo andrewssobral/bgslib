@@ -1,24 +1,22 @@
 #include "bgslib.hpp"
 
 int main() {
-    // Create an instance of AdaptiveBackgroundLearning algorithm
-    auto adaptiveBG = bgslib::BGS_Factory::Instance()->Create("AdaptiveBackgroundLearning");
-    if (!adaptiveBG) {
-        std::cerr << "Failed to create AdaptiveBackgroundLearning algorithm instance." << std::endl;
+    // Create an instance of FrameDifference algorithm
+    auto frameDiff = bgslib::BGS_Factory::Instance()->Create("FrameDifference");
+    if (!frameDiff) {
+        std::cerr << "Failed to create FrameDifference algorithm instance." << std::endl;
         return -1;
     }
 
-    // Set AdaptiveBackgroundLearning parameters
-    adaptiveBG->setParams({
-        {"alpha", "0.01"},
-        {"threshold", "25"},
+    // Set FrameDifference parameters
+    frameDiff->setParams({
         {"enableThreshold", "true"},
-        {"maxLearningFrames", "500"}
+        {"threshold", "25"}
     });
 
-    // Print AdaptiveBackgroundLearning parameters
-    auto params = adaptiveBG->getParams();
-    std::cout << "\nAdaptiveBackgroundLearning parameters:" << std::endl;
+    // Print FrameDifference parameters
+    auto params = frameDiff->getParams();
+    std::cout << "\nFrameDifference parameters:" << std::endl;
     for (const auto& param : params) {
         std::cout << param.first << ": " << param.second << std::endl;
     }
@@ -42,10 +40,10 @@ int main() {
         cv::resize(frame, resizedFrame, cv::Size(640, 480));
 
         // Apply background subtraction
-        adaptiveBG->process(resizedFrame, fgMask, bgModel);
+        frameDiff->process(resizedFrame, fgMask, bgModel);
 
         // Display parameters on the frame
-        params = adaptiveBG->getParams();
+        params = frameDiff->getParams();
         int y = 20;
         for (const auto& param : params) {
             cv::putText(resizedFrame, param.first + ": " + param.second, 

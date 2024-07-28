@@ -1,0 +1,54 @@
+# Phony targets
+.PHONY: all clean build clean_build
+
+# Default target
+all: build
+
+# Clean target
+clean:
+	rm -rf build
+
+# Build target
+build:
+	cmake -B build -S .
+	cmake --build build --config Release
+
+# Clean and build target
+clean_build: clean build
+
+# Individual demo targets
+list_algorithms: build
+	./build/list_algorithms
+
+update_params: build
+	./build/update_params
+
+camera_stream: build
+	./build/camera_stream
+
+interactive_camera_stream: build
+	./build/interactive_camera_stream
+
+performance_metrics: build
+	./build/performance_metrics
+
+adaptive_background_learning_stream: build
+	./build/adaptive_background_learning_stream
+
+frame_difference_stream: build
+	./build/frame_difference_stream
+# Help target
+help:
+	@echo "Available targets:"
+	@echo "  all               : Default target, same as 'build'"
+	@echo "  clean             : Remove build directory"
+	@echo "  build             : Configure and build the project"
+	@echo "  clean_build       : Clean and then build the project"
+	@echo "  list_algorithms   : Build and run list_algorithms demo"
+	@echo "  update_params     : Build and run update_params demo"
+	@echo "  camera_stream     : Build and run camera_stream demo"
+	@echo "  interactive_camera_stream : Build and run interactive_camera_stream demo"
+	@echo "  performance_metrics : Build and run performance_metrics demo"
+	@echo "  adaptive_background_learning_stream : Build and run adaptive_background_learning_stream demo"
+	@echo "  frame_difference_stream : Build and run frame_difference_stream demo"
+	@echo "  help              : Display this help message"
