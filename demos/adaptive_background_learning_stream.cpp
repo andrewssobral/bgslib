@@ -30,7 +30,7 @@ int main() {
         return -1;
     }
 
-    cv::Mat frame, fgMask, bgModel;
+    cv::Mat frame, resizedFrame, fgMask, bgModel;
     while (true) {
         cap >> frame;
         if (frame.empty()) {
@@ -38,11 +38,14 @@ int main() {
             break;
         }
 
+        // Resize frame to 640x480
+        cv::resize(frame, resizedFrame, cv::Size(640, 480));
+
         // Apply background subtraction
-        adaptiveBG->process(frame, fgMask, bgModel);
+        adaptiveBG->process(resizedFrame, fgMask, bgModel);
 
         // Display the original frame, foreground mask, and background model
-        cv::imshow("Original", frame);
+        cv::imshow("Original (Resized)", resizedFrame);
         cv::imshow("Foreground Mask", fgMask);
         cv::imshow("Background Model", bgModel);
 
