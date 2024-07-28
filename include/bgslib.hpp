@@ -272,14 +272,35 @@ public:
 };
 bgs_register(AdaptiveBackgroundLearning);
 
+// AdaptiveSelectiveBackgroundLearning definition
+class AdaptiveSelectiveBackgroundLearning : public IBGS {
+private:
+    double alphaLearn;
+    double alphaDetection;
+    int learningFrames;
+    long counter;
+    double minVal;
+    double maxVal;
+    int threshold;
+
+public:
+    AdaptiveSelectiveBackgroundLearning();
+    ~AdaptiveSelectiveBackgroundLearning();
+    void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) override;
+    void setParams(const std::map<std::string, std::string>& params) override;
+    std::map<std::string, std::string> getParams() const override;
+};
+bgs_register(AdaptiveSelectiveBackgroundLearning);
+
 } // namespace algorithms
 
 } // namespace bgslib
 
 // FrameDifference implementation
-bgslib::algorithms::FrameDifference::FrameDifference() : IBGS(quote(FrameDifference)),
+bgslib::algorithms::FrameDifference::FrameDifference() : 
+    IBGS(quote(FrameDifference)),
     enableThreshold(true), threshold(15) {
-        debug_construction(FrameDifference);
+    debug_construction(FrameDifference);
 }
 
 bgslib::algorithms::FrameDifference::~FrameDifference() {
@@ -328,7 +349,8 @@ std::map<std::string, std::string> bgslib::algorithms::FrameDifference::getParam
 }
 
 // AdaptiveBackgroundLearning implementation
-bgslib::algorithms::AdaptiveBackgroundLearning::AdaptiveBackgroundLearning() : IBGS(quote(AdaptiveBackgroundLearning)),
+bgslib::algorithms::AdaptiveBackgroundLearning::AdaptiveBackgroundLearning() : 
+    IBGS(quote(AdaptiveBackgroundLearning)),
     alpha(0.05), maxLearningFrames(-1), currentLearningFrame(0), minVal(0.0),
     maxVal(1.0), enableThreshold(true), threshold(15) {
     debug_construction(AdaptiveBackgroundLearning);
@@ -390,6 +412,85 @@ std::map<std::string, std::string> bgslib::algorithms::AdaptiveBackgroundLearnin
         {"alpha", std::to_string(alpha)},
         {"maxLearningFrames", std::to_string(maxLearningFrames)},
         {"enableThreshold", enableThreshold ? "true" : "false"},
+        {"threshold", std::to_string(threshold)}
+    };
+}
+
+// AdaptiveSelectiveBackgroundLearning implementation
+bgslib::algorithms::AdaptiveSelectiveBackgroundLearning::AdaptiveSelectiveBackgroundLearning() : 
+    IBGS(quote(AdaptiveSelectiveBackgroundLearning)),
+    alphaLearn(0.05), alphaDetection(0.05), learningFrames(-1), 
+    counter(0), minVal(0.0), maxVal(1.0), threshold(15) {
+    debug_construction(AdaptiveSelectiveBackgroundLearning);
+}
+
+bgslib::algorithms::AdaptiveSelectiveBackgroundLearning::~AdaptiveSelectiveBackgroundLearning() {
+    debug_destruction(AdaptiveSelectiveBackgroundLearning);
+}
+
+void bgslib::algorithms::AdaptiveSelectiveBackgroundLearning::process(const cv::Mat &img_input_, cv::Mat &img_output, cv::Mat &img_bgmodel) {
+    init(img_input_, img_output, img_bgmodel);
+
+    cv::Mat img_input;
+    if (img_input_.channels() == 3)
+        cv::cvtColor(img_input_, img_input, cv::COLOR_BGR2GRAY);
+    else
+        img_input_.copyTo(img_input);
+
+    if (img_background.empty())
+        img_input.copyTo(img_background);
+
+    cv::Mat img_input_f, img_background_f, img_diff_f;
+    img_input.convertTo(img_input_f, CV_32F, 1. / 255.);
+    img_background.convertTo(img_background_f, CV_32F, 1. / 255.);
+    cv::absdiff(img_input_f, img_background_f, img_diff_f);
+
+    img_diff_f.convertTo(img_foreground, CV_8U, 255.0 / (maxVal - minVal), -minVal);
+
+    cv::threshold(img_foreground, img_foreground, threshold, 255, cv::THRESH_BINARY);
+    cv::medianBlur(img_foreground, img_foreground, 3);
+
+    if (learningFrames > 0 && counter <= learningFrames) {
+        img_background_f = alphaLearn * img_input_f + (1 - alphaLearn) * img_background_f;
+        counter++;
+    }
+    else {
+        for (int i = 0; i < img_input.rows; i++) {
+            for (int j = 0; j < img_input.cols; j++) {
+                if (img_foreground.at<uchar>(i, j) == 0) {
+                    img_background_f.at<float>(i, j) = alphaDetection * img_input_f.at<float>(i, j) + (1 - alphaDetection) * img_background_f.at<float>(i, j);
+                }
+            }
+        }
+    }
+
+    img_background_f.convertTo(img_background, CV_8UC1, 255.0 / (maxVal - minVal), -minVal);
+
+    img_foreground.copyTo(img_output);
+    img_background.copyTo(img_bgmodel);
+
+    firstTime = false;
+}
+
+void bgslib::algorithms::AdaptiveSelectiveBackgroundLearning::setParams(const std::map<std::string, std::string>& params) {
+    for (const auto& param : params) {
+        if (param.first == "alphaLearn") {
+            alphaLearn = std::stod(param.second);
+        } else if (param.first == "alphaDetection") {
+            alphaDetection = std::stod(param.second);
+        } else if (param.first == "learningFrames") {
+            learningFrames = std::stoi(param.second);
+        } else if (param.first == "threshold") {
+            threshold = std::stoi(param.second);
+        }
+    }
+}
+
+std::map<std::string, std::string> bgslib::algorithms::AdaptiveSelectiveBackgroundLearning::getParams() const {
+    return {
+        {"alphaLearn", std::to_string(alphaLearn)},
+        {"alphaDetection", std::to_string(alphaDetection)},
+        {"learningFrames", std::to_string(learningFrames)},
         {"threshold", std::to_string(threshold)}
     };
 }

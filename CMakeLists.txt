@@ -32,3 +32,6 @@ target_link_libraries(frame_difference_stream bgslib ${OpenCV_LIBS})
 
 add_executable(adaptive_background_learning_stream demos/adaptive_background_learning_stream.cpp)
 target_link_libraries(adaptive_background_learning_stream bgslib ${OpenCV_LIBS})
+
+add_executable(adaptive_selective_bg_learning_stream demos/adaptive_selective_bg_learning_stream.cpp)
+target_link_libraries(adaptive_selective_bg_learning_stream bgslib ${OpenCV_LIBS})
