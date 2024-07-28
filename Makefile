@@ -35,10 +35,13 @@ performance_metrics: build
 	./build/performance_metrics
 
 # Demos targets
-demos: build frame_difference_stream adaptive_background_learning_stream adaptive_selective_bg_learning_stream weighted_moving_mean_stream weighted_moving_variance_stream
+demos: build frame_difference_stream static_frame_difference_stream adaptive_background_learning_stream adaptive_selective_bg_learning_stream weighted_moving_mean_stream weighted_moving_variance_stream
 
 frame_difference_stream: build
 	./build/frame_difference_stream
+
+static_frame_difference_stream: build
+	./build/static_frame_difference_stream
 
 adaptive_background_learning_stream: build
 	./build/adaptive_background_learning_stream
@@ -67,6 +70,7 @@ help:
 	@echo "  interactive_camera_stream : Build and run interactive_camera_stream example"
 	@echo "  performance_metrics : Build and run performance_metrics example"
 	@echo "  frame_difference_stream : Build and run frame_difference_stream demo"
+	@echo "  static_frame_difference_stream : Build and run static_frame_difference_stream demo"
 	@echo "  adaptive_background_learning_stream : Build and run adaptive_background_learning_stream demo"
 	@echo "  adaptive_selective_bg_learning_stream : Build and run adaptive_selective_bg_learning_stream demo"
 	@echo "  weighted_moving_mean_stream : Build and run weighted_moving_mean_stream demo"

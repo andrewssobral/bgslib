@@ -8,6 +8,7 @@ bgslib is a C++ header-only library for background subtraction. It provides a fl
 - Factory pattern for creating algorithm instances
 - Support for multiple background subtraction algorithms:
   - FrameDifference
+  - StaticFrameDifference
   - AdaptiveBackgroundLearning
   - AdaptiveSelectiveBackgroundLearning
   - WeightedMovingMean

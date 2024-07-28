@@ -296,6 +296,62 @@ public:
 };
 bgs_register(FrameDifference);
 
+// StaticFrameDifference algorithm
+class StaticFrameDifference : public IBGS {
+private:
+    bool enableThreshold;
+    int threshold;
+
+public:
+    StaticFrameDifference() : 
+        IBGS("StaticFrameDifference"),
+        enableThreshold(true), threshold(15) {
+        debug_construction(StaticFrameDifference);
+    }
+
+    ~StaticFrameDifference() {
+        debug_destruction(StaticFrameDifference);
+    }
+
+    void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel) override {
+        init(img_input, img_output, img_bgmodel);
+
+        if (img_background.empty())
+            img_input.copyTo(img_background);
+
+        cv::absdiff(img_input, img_background, img_foreground);
+
+        if (img_foreground.channels() == 3)
+            cv::cvtColor(img_foreground, img_foreground, cv::COLOR_BGR2GRAY);
+
+        if (enableThreshold)
+            cv::threshold(img_foreground, img_foreground, threshold, 255, cv::THRESH_BINARY);
+
+        img_foreground.copyTo(img_output);
+        img_background.copyTo(img_bgmodel);
+
+        firstTime = false;
+    }
+
+    void setParams(const std::map<std::string, std::string>& params) override {
+        for (const auto& param : params) {
+            if (param.first == "enableThreshold") {
+                enableThreshold = (param.second == "true");
+            } else if (param.first == "threshold") {
+                threshold = std::stoi(param.second);
+            }
+        }
+    }
+
+    std::map<std::string, std::string> getParams() const override {
+        return {
+            {"enableThreshold", enableThreshold ? "true" : "false"},
+            {"threshold", std::to_string(threshold)}
+        };
+    }
+};
+bgs_register(StaticFrameDifference);
+
 // AdaptiveBackgroundLearning algorithm
 class AdaptiveBackgroundLearning : public IBGS {
 private:
