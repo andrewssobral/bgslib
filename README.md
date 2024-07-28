@@ -11,6 +11,7 @@ bgslib is a C++ header-only library for background subtraction. It provides a fl
   - AdaptiveBackgroundLearning
   - AdaptiveSelectiveBackgroundLearning
   - WeightedMovingMean
+  - WeightedMovingVariance
 - Easy parameter adjustment for algorithms
 - Cross-platform compatibility (Windows, macOS, Linux)
 - Performance metrics for real-time monitoring

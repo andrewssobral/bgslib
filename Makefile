@@ -35,7 +35,7 @@ performance_metrics: build
 	./build/performance_metrics
 
 # Demos targets
-demos: build frame_difference_stream adaptive_background_learning_stream adaptive_selective_bg_learning_stream weighted_moving_mean_stream
+demos: build frame_difference_stream adaptive_background_learning_stream adaptive_selective_bg_learning_stream weighted_moving_mean_stream weighted_moving_variance_stream
 
 frame_difference_stream: build
 	./build/frame_difference_stream
@@ -48,6 +48,9 @@ adaptive_selective_bg_learning_stream: build
 
 weighted_moving_mean_stream: build
 	./build/weighted_moving_mean_stream
+
+weighted_moving_variance_stream: build
+	./build/weighted_moving_variance_stream
 
 # Help target
 help:
@@ -67,4 +70,5 @@ help:
 	@echo "  adaptive_background_learning_stream : Build and run adaptive_background_learning_stream demo"
 	@echo "  adaptive_selective_bg_learning_stream : Build and run adaptive_selective_bg_learning_stream demo"
 	@echo "  weighted_moving_mean_stream : Build and run weighted_moving_mean_stream demo"
+	@echo "  weighted_moving_variance_stream : Build and run weighted_moving_variance_stream demo"
 	@echo "  help              : Display this help message"
