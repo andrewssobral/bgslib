@@ -1,21 +1,26 @@
 # bgslib
 
-bgslib is a C++ header-only library for background subtraction. It provides a flexible and extensible framework for implementing and using various background subtraction algorithms.
+bgslib is a powerful, header-only C++ library for background subtraction in computer vision applications. It provides a flexible and extensible framework for implementing, using, and evaluating various background subtraction algorithms.
 
 ## Features
 
-- Header-only library for easy integration
-- Factory pattern for creating algorithm instances
-- Support for multiple background subtraction algorithms:
-  - FrameDifference
-  - StaticFrameDifference
-  - AdaptiveBackgroundLearning
-  - AdaptiveSelectiveBackgroundLearning
-  - WeightedMovingMean
-  - WeightedMovingVariance
-- Easy parameter adjustment for algorithms
-- Cross-platform compatibility (Windows, macOS, Linux)
-- Performance metrics for real-time monitoring
+- **Header-only library**: Easy integration into existing projects
+- **Multiple algorithms**: Includes several background subtraction techniques
+- **Factory pattern**: Simplifies algorithm instantiation and management
+- **Flexible parameter adjustment**: Easy tuning of algorithm parameters
+- **Cross-platform compatibility**: Works on Windows, macOS, and Linux
+- **Performance metrics**: Real-time monitoring of algorithm performance
+- **Evaluation tools**: Assess algorithm effectiveness on datasets
+- **Extensible design**: Easily add new background subtraction algorithms
+
+### Included Algorithms
+
+1. FrameDifference
+2. StaticFrameDifference
+3. AdaptiveBackgroundLearning
+4. AdaptiveSelectiveBackgroundLearning
+5. WeightedMovingMean
+6. WeightedMovingVariance
 
 ## Requirements
 
@@ -28,10 +33,9 @@ bgslib is a C++ header-only library for background subtraction. It provides a fl
 As bgslib is a header-only library, you don't need to compile it separately. Simply include the `bgslib.hpp` header in your project.
 
 1. Clone the repository:
-
-```bash
-git clone https://github.com/andrewssobral/bgslib
-```
+   ```bash
+   git clone https://github.com/andrewssobral/bgslib.git
+   ```
 
 2. Add the `include` directory to your project's include path.
 
@@ -93,32 +97,50 @@ for (const auto& param : currentParams) {
 }
 ```
 
-## Examples
+## Examples and Demos
 
-The library comes with several example applications demonstrating various features:
+The library includes several example applications and demos:
 
-1. `list_algorithms`: Lists all available background subtraction algorithms.
-2. `update_params`: Demonstrates how to update algorithm parameters.
-3. `camera_stream`: Basic example of using the library with a camera stream.
-4. `interactive_camera_stream`: Allows real-time parameter adjustment using keyboard controls.
-5. `performance_metrics`: Displays performance metrics (FPS, processing time) while running the algorithm.
+### Examples
+1. `list_algorithms`: Lists all available background subtraction algorithms
+2. `update_params`: Demonstrates how to update algorithm parameters
+3. `camera_stream`: Basic example of using the library with a camera stream
+4. `interactive_camera_stream`: Allows real-time parameter adjustment using keyboard controls
+5. `performance_metrics`: Displays performance metrics (FPS, processing time) while running the algorithm
+
+### Demos
+- Separate demo files for each algorithm, showcasing their usage with a camera stream
+
+### Building and Running Examples
 
 To build and run the examples:
 
 ```bash
-./build.sh
-./build/list_algorithms
-./build/camera_stream
-# ... and so on for other examples
+mkdir build && cd build
+cmake ..
+make
+./list_algorithms
+./camera_stream
+# ... and so on for other examples and demos
+```
+
+## Evaluation Tool
+
+The library includes an evaluation tool (`evaluate_algorithm.cpp`) that allows you to assess the performance of different algorithms on datasets. It calculates metrics such as True Positives, False Positives, Recall, Precision, and F-score.
+
+To use the evaluation tool:
+
+```bash
+./evaluate_algorithm --algorithm FrameDifference --dataset ./path/to/dataset --frames frames --groundtruth groundtruth
 ```
 
 ## Extending the Library
 
 To add a new background subtraction algorithm:
 
-1. Create a new class that inherits from `bgslib::IBGS`.
-2. Implement the required methods (`process`, `setParams`, `getParams`).
-3. Register the new algorithm using the `bgs_register` macro.
+1. Create a new class that inherits from `bgslib::IBGS`
+2. Implement the required methods (`process`, `setParams`, `getParams`)
+3. Register the new algorithm using the `bgs_register` macro
 
 Example:
 
@@ -140,6 +162,17 @@ public:
 bgs_register(MyNewAlgorithm);
 ```
 
+## Contributing
+
+Contributions to bgslib are welcome! Please feel free to submit pull requests, create issues or spread the word.
+
 ## License
 
-MIT License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- OpenCV community for their excellent computer vision library
+- All contributors who have helped to improve this library
+
+For more information and updates, please visit the [bgslib GitHub repository](https://github.com/andrewssobral/bgslib).
