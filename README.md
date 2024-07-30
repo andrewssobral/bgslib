@@ -1,6 +1,8 @@
 # bgslib
 
-bgslib is a powerful, header-only C++ library for background subtraction in computer vision applications. It provides a flexible and extensible framework for implementing, using, and evaluating various background subtraction algorithms.
+bgslib is a powerful, header-only C++ library for background subtraction in computer vision applications. Background subtraction is a fundamental technique used in various fields such as video surveillance, traffic monitoring, and human-computer interaction to detect moving objects in video streams.
+
+This library provides a flexible and extensible framework for implementing, using, and evaluating various background subtraction algorithms. It's designed to be easy to use while allowing for advanced customization and extension.
 
 ## Features
 
@@ -38,6 +40,27 @@ As bgslib is a header-only library, you don't need to compile it separately. Sim
    ```
 
 2. Add the `include` directory to your project's include path.
+
+## Building and Running Examples
+
+The library comes with a Makefile that simplifies the build process and running of examples. Here are some common commands:
+
+```bash
+# Build the project
+make build
+
+# Build and run all examples
+make examples
+
+# Build and run all demos
+make demos
+
+# Run evaluations
+make run_evals
+
+# For more options
+make help
+```
 
 ## Usage
 
@@ -131,8 +154,17 @@ The library includes an evaluation tool (`evaluate_algorithm.cpp`) that allows y
 To use the evaluation tool:
 
 ```bash
-./evaluate_algorithm --algorithm FrameDifference --dataset ./path/to/dataset --frames frames --groundtruth groundtruth
+./build/evaluate_algorithm --algorithm FrameDifference --dataset ./path/to/dataset --frames frames --groundtruth groundtruth
 ```
+
+Options:
+- `--algorithm`: Specifies the algorithm to use (default: "FrameDifference")
+- `--dataset`: Sets the base dataset path
+- `--frames`: Sets the frames directory name (default: "frames")
+- `--groundtruth`: Sets the groundtruth directory name (default: "groundtruth")
+- `--extension`: Sets the file extension for images (default: ".png")
+- `--delay`: Sets the delay between frames in milliseconds (default: 30)
+- `--visual-debug`: Enables visual debugging (optional)
 
 ## Extending the Library
 
@@ -161,6 +193,12 @@ public:
 
 bgs_register(MyNewAlgorithm);
 ```
+
+## Troubleshooting
+
+- If you encounter "OpenCV not found" errors, ensure that OpenCV is properly installed and its path is correctly set in your environment.
+- For performance issues, try adjusting the parameters of the algorithms or using a more efficient algorithm for your specific use case.
+- If you're having trouble with a specific dataset, ensure that the images are in a supported format and the directory structure matches what the evaluation tool expects.
 
 ## Contributing
 
