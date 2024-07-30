@@ -4,6 +4,27 @@ bgslib is a powerful, header-only C++ library for background subtraction in comp
 
 This library provides a flexible and extensible framework for implementing, using, and evaluating various background subtraction algorithms. It's designed to be easy to use while allowing for advanced customization and extension.
 
+## Table of Contents
+
+1. [Features](#features)
+2. [Requirements](#requirements)
+3. [Installation](#installation)
+4. [Quick Start](#quick-start)
+5. [Building and Running Examples](#building-and-running-examples)
+6. [Usage](#usage)
+   - [Basic Usage](#basic-usage)
+   - [Adjusting Algorithm Parameters](#adjusting-algorithm-parameters)
+   - [Getting Current Parameters](#getting-current-parameters)
+7. [Examples and Demos](#examples-and-demos)
+8. [Evaluation Tool](#evaluation-tool)
+9. [Extending the Library](#extending-the-library)
+10. [Performance Considerations](#performance-considerations)
+11. [Troubleshooting](#troubleshooting)
+12. [Contributing](#contributing)
+13. [Citing](#citing)
+14. [License](#license)
+15. [Acknowledgments](#acknowledgments)
+
 ## Features
 
 - **Header-only library**: Easy integration into existing projects
