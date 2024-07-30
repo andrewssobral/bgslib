@@ -1,5 +1,5 @@
 # Phony targets
-.PHONY: all clean build clean_build examples demos
+.PHONY: all clean build clean_build examples demos evals run run_examples run_evals run_evals_visual_debug run_custom_eval
 
 # Default target
 all: build
@@ -55,6 +55,41 @@ weighted_moving_mean_stream: build
 weighted_moving_variance_stream: build
 	./build/weighted_moving_variance_stream
 
+# Evaluation targets
+evals: build evaluate_algorithm
+
+evaluate_algorithm: build
+	./build/evaluate_algorithm
+
+run: run_examples run_evals
+
+run_examples:
+	./build/list_algorithms
+	./build/update_params
+
+DATASET_PATH ?= ./datasets/ucsd/boats
+FRAMES_DIR ?= frames
+GROUNDTRUTH_DIR ?= groundtruth
+FILE_EXTENSION ?= .png
+DELAY ?= 30
+VISUAL_DEBUG ?= false
+
+# Usage: make run_evals [DATASET_PATH="./datasets/ucsd/boats"] [FRAMES_DIR="frames"] [GROUNDTRUTH_DIR="groundtruth"] [FILE_EXTENSION=".png"] [DELAY=30] [VISUAL_DEBUG=true]
+run_evals:
+	./build/evaluate_algorithm --algorithm FrameDifference --dataset $(DATASET_PATH) --frames $(FRAMES_DIR) --groundtruth $(GROUNDTRUTH_DIR) --extension $(FILE_EXTENSION) $(if $(filter true,$(VISUAL_DEBUG)),--delay $(DELAY) --visual-debug,)
+	./build/evaluate_algorithm --algorithm StaticFrameDifference --dataset $(DATASET_PATH) --frames $(FRAMES_DIR) --groundtruth $(GROUNDTRUTH_DIR) --extension $(FILE_EXTENSION) $(if $(filter true,$(VISUAL_DEBUG)),--delay $(DELAY) --visual-debug,)
+	./build/evaluate_algorithm --algorithm AdaptiveBackgroundLearning --dataset $(DATASET_PATH) --frames $(FRAMES_DIR) --groundtruth $(GROUNDTRUTH_DIR) --extension $(FILE_EXTENSION) $(if $(filter true,$(VISUAL_DEBUG)),--delay $(DELAY) --visual-debug,)
+	./build/evaluate_algorithm --algorithm AdaptiveSelectiveBackgroundLearning --dataset $(DATASET_PATH) --frames $(FRAMES_DIR) --groundtruth $(GROUNDTRUTH_DIR) --extension $(FILE_EXTENSION) $(if $(filter true,$(VISUAL_DEBUG)),--delay $(DELAY) --visual-debug,)
+	./build/evaluate_algorithm --algorithm WeightedMovingMean --dataset $(DATASET_PATH) --frames $(FRAMES_DIR) --groundtruth $(GROUNDTRUTH_DIR) --extension $(FILE_EXTENSION) $(if $(filter true,$(VISUAL_DEBUG)),--delay $(DELAY) --visual-debug,)
+	./build/evaluate_algorithm --algorithm WeightedMovingVariance --dataset $(DATASET_PATH) --frames $(FRAMES_DIR) --groundtruth $(GROUNDTRUTH_DIR) --extension $(FILE_EXTENSION) $(if $(filter true,$(VISUAL_DEBUG)),--delay $(DELAY) --visual-debug,)
+
+run_evals_visual_debug:
+	$(MAKE) run_evals DELAY=500 VISUAL_DEBUG=true
+
+# Usage: make run_custom_eval EVAL_ARGS="--algorithm WeightedMovingMean --dataset ./my_dataset --delay 100 --visual-debug"
+run_custom_eval:
+	./build/evaluate_algorithm $(EVAL_ARGS)
+
 # Help target
 help:
 	@echo "Available targets:"
@@ -64,6 +99,11 @@ help:
 	@echo "  clean_build       : Clean and then build the project"
 	@echo "  examples          : Build and run all examples"
 	@echo "  demos             : Build and run all demos"
+	@echo "  evals             : Build and run all evaluations"
+	@echo "  run               : Run examples and evaluations"
+	@echo "  run_evals         : Run evaluations with customizable parameters"
+	@echo "  run_evals_visual_debug : Run evaluations with visual debugging enabled"
+	@echo "  run_custom_eval   : Run a custom evaluation"
 	@echo "  list_algorithms   : Build and run list_algorithms example"
 	@echo "  update_params     : Build and run update_params example"
 	@echo "  camera_stream     : Build and run camera_stream example"
@@ -75,4 +115,5 @@ help:
 	@echo "  adaptive_selective_bg_learning_stream : Build and run adaptive_selective_bg_learning_stream demo"
 	@echo "  weighted_moving_mean_stream : Build and run weighted_moving_mean_stream demo"
 	@echo "  weighted_moving_variance_stream : Build and run weighted_moving_variance_stream demo"
+	@echo "  evaluate_algorithm : Build and run evaluate_algorithm evaluation"
 	@echo "  help              : Display this help message"

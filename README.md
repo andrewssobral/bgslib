@@ -19,7 +19,7 @@ bgslib is a C++ header-only library for background subtraction. It provides a fl
 
 ## Requirements
 
-- C++14 compatible compiler
+- C++17 compatible compiler
 - OpenCV 4.x
 - CMake 3.10 or higher
 
