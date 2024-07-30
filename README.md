@@ -41,6 +41,27 @@ As bgslib is a header-only library, you don't need to compile it separately. Sim
 
 2. Add the `include` directory to your project's include path.
 
+## Quick Start
+
+To get started quickly with bgslib:
+
+1. Include the header in your C++ file:
+   ```cpp
+   #include "bgslib.hpp"
+   ```
+
+2. Create an instance of an algorithm:
+   ```cpp
+   auto algorithm = bgslib::BGS_Factory::Instance()->Create("FrameDifference");
+   ```
+
+3. Process frames:
+   ```cpp
+   cv::Mat frame, fgMask, bgModel;
+   // ... obtain frame from video or camera ...
+   algorithm->process(frame, fgMask, bgModel);
+   ```
+
 ## Building and Running Examples
 
 The library comes with a Makefile that simplifies the build process and running of examples. Here are some common commands:
@@ -194,6 +215,15 @@ public:
 bgs_register(MyNewAlgorithm);
 ```
 
+## Performance Considerations
+
+When using bgslib, consider the following to optimize performance:
+
+- Choose the appropriate algorithm for your use case. Some algorithms are faster but less accurate, while others are more robust but computationally intensive.
+- Adjust algorithm parameters to balance between accuracy and speed.
+- For real-time applications, consider processing frames at a lower resolution.
+- Utilize OpenCV's GPU acceleration if available for your system.
+
 ## Troubleshooting
 
 - If you encounter "OpenCV not found" errors, ensure that OpenCV is properly installed and its path is correctly set in your environment.
@@ -203,6 +233,26 @@ bgs_register(MyNewAlgorithm);
 ## Contributing
 
 Contributions to bgslib are welcome! Please feel free to submit pull requests, create issues or spread the word.
+Here's how you can contribute:
+
+1. Fork the repository on GitHub.
+2. Create a new branch for your feature or bug fix.
+3. Write your code and tests.
+4. Ensure all tests pass and the code follows the project's coding style.
+5. Submit a pull request with a clear description of your changes.
+
+## Citing
+
+If you use bgslib in your research, please cite it as follows:
+
+```
+@software{bgslib,
+  author = {Cordolino Sobral, Andrews},
+  title = {bgslib: A header-only C++ Background Subtraction Library},
+  year = {2024},
+  url = {https://github.com/andrewssobral/bgslib}
+}
+```
 
 ## License
 
