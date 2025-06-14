@@ -282,7 +282,13 @@ public:
             if (param.first == "enableThreshold") {
                 enableThreshold = (param.second == "true");
             } else if (param.first == "threshold") {
-                threshold = std::stoi(param.second);
+                try {
+                    threshold = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             }
         }
     }
@@ -338,7 +344,13 @@ public:
             if (param.first == "enableThreshold") {
                 enableThreshold = (param.second == "true");
             } else if (param.first == "threshold") {
-                threshold = std::stoi(param.second);
+                try {
+                    threshold = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             }
         }
     }
@@ -411,13 +423,31 @@ public:
     void setParams(const std::map<std::string, std::string>& params) override {
         for (const auto& param : params) {
             if (param.first == "alpha") {
-                alpha = std::stod(param.second);
+                try {
+                    alpha = std::stod(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected a double." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for a double." << std::endl;
+                }
             } else if (param.first == "maxLearningFrames") {
-                maxLearningFrames = std::stoi(param.second);
+                try {
+                    maxLearningFrames = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             } else if (param.first == "enableThreshold") {
                 enableThreshold = (param.second == "true");
             } else if (param.first == "threshold") {
-                threshold = std::stoi(param.second);
+                try {
+                    threshold = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             }
         }
     }
@@ -503,13 +533,37 @@ public:
     void setParams(const std::map<std::string, std::string>& params) override {
         for (const auto& param : params) {
             if (param.first == "alphaLearn") {
-                alphaLearn = std::stod(param.second);
+                try {
+                    alphaLearn = std::stod(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected a double." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for a double." << std::endl;
+                }
             } else if (param.first == "alphaDetection") {
-                alphaDetection = std::stod(param.second);
+                try {
+                    alphaDetection = std::stod(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected a double." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for a double." << std::endl;
+                }
             } else if (param.first == "learningFrames") {
-                learningFrames = std::stoi(param.second);
+                try {
+                    learningFrames = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             } else if (param.first == "threshold") {
-                threshold = std::stoi(param.second);
+                try {
+                    threshold = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             }
         }
     }
@@ -595,7 +649,13 @@ public:
             } else if (param.first == "enableThreshold") {
                 enableThreshold = (param.second == "true");
             } else if (param.first == "threshold") {
-                threshold = std::stoi(param.second);
+                try {
+                    threshold = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             }
         }
     }
@@ -684,8 +744,8 @@ public:
 
         img_foreground.copyTo(img_output);
 
-        img_background = cv::Mat::zeros(img_input.size(), img_input.type());
-        img_background.copyTo(img_bgmodel);
+        // Assign the weighted mean to img_bgmodel
+        img_mean_f.convertTo(img_bgmodel, CV_8U, 255.0);
 
         img_input_prev_1.copyTo(img_input_prev_2);
         img_input.copyTo(img_input_prev_1);
@@ -700,7 +760,13 @@ public:
             } else if (param.first == "enableThreshold") {
                 enableThreshold = (param.second == "true");
             } else if (param.first == "threshold") {
-                threshold = std::stoi(param.second);
+                try {
+                    threshold = std::stoi(param.second);
+                } catch (const std::invalid_argument& ia) {
+                    std::cerr << "Error: Invalid value '" << param.second << "' for parameter '" << param.first << "'. Expected an integer." << std::endl;
+                } catch (const std::out_of_range& oor) {
+                    std::cerr << "Error: Value '" << param.second << "' for parameter '" << param.first << "' is out of range for an integer." << std::endl;
+                }
             }
         }
     }
